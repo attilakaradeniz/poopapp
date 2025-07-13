@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Activity Dashboard</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2rem;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .summary {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+	
+<nav style="margin-bottom: 1rem;">
+    <a href="/" style="margin-right: 1rem;">Home</a>
+    <a href="/dashboard" style="margin-right: 1rem;">Dashboard</a>
+    <a href="/form">New Entry</a>
+</nav>
+	
+    <h1>⏱ Activity Records Dashboard</h1>
+    
+<h2> Total Duration Today:</h2>
+<p>
+{% set minutes = total_duration // 60 %}
+{% set seconds = total_duration % 60 %}
+{{ minutes }} minutes {{ seconds  }} seconds
+<p/>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration (sec)</th>
+                <th>💩</th>
+                <!-- <th>&#9735</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+                <td>{{ record[2] }}</td>
+                <td>{{ record[3] }}</td>
+                <td>{{ record[4] }}</td>
+                <td>
+					<form action="/delete/{{ record[0] }}" method="post" style="display:inline;">
+						<button type="submit" style="color:red; display: block; margin-bottom: 4px; width: 100%">Delete</button>
+					</form>
+				<!-- Edit Button -->
+				<a href="/edit/{{ record[0] }}" style="display: block; width: 100%;">
+					<button style="width: 100%;">Edit</button>
+				</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+
+
+</body>
+</html>

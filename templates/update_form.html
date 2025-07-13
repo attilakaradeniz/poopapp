@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Record</title>
+</head>
+<body>
+	
+<nav style="margin-bottom: 1rem;">
+    <a href="/" style="margin-right: 1rem;">Home</a>
+    <a href="/dashboard" style="margin-right: 1rem;">Dashboard</a>
+    <a href="/form">New Entry</a>
+</nav>
+	
+    <h1>Edit Record</h1>
+    <form method="POST">
+        <label for="date">Date (YYYY-MM-DD):</label>
+        <input type="text" name="date" value="{{ record[1] }}" required><br>
+
+        <label for="start_time">Start Time (HH:MM:SS):</label>
+        <input type="text" name="start_time" value="{{ record[2] }}" required><br>
+
+        <label for="end_time">End Time (HH:MM:SS):</label>
+        <input type="text" name="end_time" value="{{ record[3] }}" required><br>
+
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

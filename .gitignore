@@ -1,0 +1,16 @@
+# Python cache dosyaları
+__pycache__/
+*.pyc
+
+# Veritabanı dosyası
+records.db
+
+# VS Code ayar dosyaları (ileride C64'te de işine yarar)
+.vscode/
+
+# Geçici dosyalar
+*.log
+*.tmp
+
+# Eğer varsa, çevresel ayarları içeren .env dosyası
+.env
