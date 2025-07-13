@@ -32,13 +32,15 @@ def add_record(date, start_time, end_time):
         conn.commit()
 
 def get_all_records():
-    with sqlite3.connect(DB_FILE) as conn:
-        c = conn.cursor()
-        c.execute('''
+        conn = sqlite3.connect("records.db")
+        cursor = conn.cursor()
+        cursor.execute('''
             SELECT * FROM records
-            ORDER BY date DESC
+            ORDER BY date DESC, start_time DESC
         ''')
-        return c.fetchall()
+        records = cursor.fetchall()
+        conn.close()
+        return records
 
 def delete_record(record_id):
     import sqlite3

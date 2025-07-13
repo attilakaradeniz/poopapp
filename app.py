@@ -28,23 +28,40 @@ def form():
 
 @app.route("/submit", methods=["POST"])
 def submit():
-	raw = request.form.get("raw_input", "")
+    # String giriş kontrolü
+    raw = request.form.get("raw_input", "")
 
-	# Input kontrolü (16 karakter ve sayılar)
-	if len(raw) != 16 or not raw.isdigit():
-		return "Invalid input format", 400
+    if raw:  # Eğer raw_input varsa, string yöntemiyle giriş yapılıyor
+        # Input kontrolü (16 karakter ve sayılar)
+        if len(raw) != 16 or not raw.isdigit():
+            return "Invalid input format", 400
 
-# Tarih, başlama ve bitiş saatlerini ayırma
-	date = raw[:8]# 'DDMMYYYY' -> '12072025'
-	start = raw[8:12] # 'HHMM' -> '1058'
-	end = raw[12:16] # 'HHMM' -> '1108'
-	# Tarihi 'YYYY-MM-DD' formatına çevirme
-	formatted_date = f"{date[4:8]}-{date[2:4]}-{date[0:2]}"
-	start_time = f"{start[:2]}:{start[2:]}:00"# 'HH:MM:00' formatında
-	end_time = f"{end[:2]}:{end[2:]}:00"# 'HH:MM:00' formatında
-	# Veriyi veritabanına ekle
-	add_record(formatted_date, start_time, end_time)
-	return redirect("/dashboard")
+        # Tarih, başlama ve bitiş saatlerini ayırma
+        date = raw[:8]  # 'DDMMYYYY' -> '12072025'
+        start = raw[8:12]  # 'HHMM' -> '1058'
+        end = raw[12:16]  # 'HHMM' -> '1108'
+
+        # Tarihi 'YYYY-MM-DD HH:MM:SS' formatına çevirme
+        formatted_date = f"{date[4:8]}-{date[2:4]}-{date[0:2]} {start[:2]}:{start[2:]}:00"
+        start_time = f"{start[:2]}:{start[2:]}:00"  # 'HH:MM:00' formatında
+        end_time = f"{end[:2]}:{end[2:]}:00"  # 'HH:MM:00' formatında
+
+        # Veriyi veritabanına ekle
+        add_record(formatted_date, start_time, end_time)
+
+    else:  # Eğer raw_input yoksa, start ve end butonları ile giriş yapılıyor
+        start_time = request.form.get("start_time")
+        end_time = request.form.get("end_time")
+        date = request.form.get("date")
+
+        if not date or not start_time or not end_time:
+            return "Eksik veri", 400
+
+        # Veriyi veritabanına ekle
+        add_record(formatted_date, start_time, end_time)
+
+    return redirect("/dashboard")
+
 
 @app.route("/")
 def home():
@@ -114,8 +131,10 @@ def get_record_by_id(record_id):
 def save_timer():
 	data = request.get_json()
 	duration = data.get('duration')
+	start_time = data.get('start_time')
+	end_time = data.get('end_time')
 
-	if not duration:
+	if not duration or not start_time or not end_time:
 		return jsonify({"error": "Invalid data"}), 400
 
 	# save to DB
@@ -124,7 +143,7 @@ def save_timer():
 		c.execute('''
 		INSERT INTO records (date, start_time, end_time, duration_seconds)
 		VALUES (?, ?, ?, ?)''',
-		(date_cls.today().isoformat(), "00:00:00", "00:00:00", duration))
+		(date_cls.today().isoformat(), start_time, end_time, duration))
 		conn.commit()
 	return jsonify({"status": "success", "duration": duration}), 200
 
