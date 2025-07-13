@@ -12,5 +12,8 @@ records.db
 *.log
 *.tmp
 
-# Eğer varsa, çevresel ayarları içeren .env dosyası
+# environments  .env file
 .env
+
+# environments .venv file
+.venv/

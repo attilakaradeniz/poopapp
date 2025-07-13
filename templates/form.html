@@ -1,69 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Add New Record</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        input[type="tel"] {
-            width: 100%;
-            font-size: 1.2rem;
-            padding: 0.75rem;
-            margin-top: 0.5rem;
-            margin-bottom: 1rem;
-            box-sizing: border-box;
-        }
-        button {
-			appearance: none;
-			-webkit-appearance: none;
-			display: block;
-            width: 100%;
-            padding: 1rem;
-            font-size: 1.2rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-			border-sizing: border-box;
-			transition: background-color 0.3s ease;
-			cursor: pointer;
-        }
-        button:active {
-            background-color: #3e8e41;
-        }
-        .info {
-            margin-top: 1rem;
-            color: gray;
-            font-size: 0.95rem;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poop Timer</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 2rem;
+        }
+        .button-container {
+            margin: 20px;
+        }
+        .timer-container {
+            margin-top: 30px;
+        }
+        #timer {
+            font-size: 2rem;
+        }
+        #progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            height: 20px;
+        }
+        #progress-bar span {
+            display: block;
+            height: 100%;
+            background-color: #76c7c0;
+            width: 0%;
+        }
+    </style>
 </head>
 <body>
-	
-<nav style="margin-bottom: 1rem;">
-    <a href="/" style="margin-right: 1rem;">Home</a>
-    <a href="/dashboard" style="margin-right: 1rem;">Dashboard</a>
-    <a href="/form">New Entry</a>
-</nav>
-	
-    <h1> Add New Record</h1>
-    <form action="/submit" method="post">
-        <label for="raw_input">Enter string:</label>
-        <input type="tel" name="raw_input" id="raw_input"
-               pattern="[0-9]{16}" maxlength="16"
-               required autofocus placeholder="e.g. 1107202510581108">
-        <button type="submit">Submit</button>
-    </form>
-    <div class="info">
-        Format: <code>DDMMYYYYHHMMHHMM</code><br>
-        Example: <code>1107202510581108</code>
-    </div>
+
+    <h1>Poop Timer</h1>
+    <div class="button-container">
+        <button id="startBtn" onclick="startTimer()">START</button>
+        <button id="endBtn" onclick="endTimer()" disabled>END</button>
+    </div>
+
+    <div class="timer-container">
+        <p id="timer">00:00</p>
+        <div id="progress-bar"><span></span></div>
+    </div>
+
+    <script>
+        let timer;
+        let seconds = 0;
+        let isRunning = false;
+        let progressBar = document.querySelector("#progress-bar span");
+
+        function startTimer() {
+            isRunning = true;
+            document.getElementById("startBtn").disabled = true;
+            document.getElementById("endBtn").disabled = false;
+
+            timer = setInterval(() => {
+                seconds++;
+                let mins = Math.floor(seconds / 60);
+                let secs = seconds % 60;
+
+                // Update timer display
+                document.getElementById("timer").innerText = `${pad(mins)}:${pad(secs)}`;
+
+                // Update progress bar
+                let percentage = (seconds / 3600) * 100; // Assuming 1 hour as max for the demo
+                progressBar.style.width = `${percentage}%`;
+
+            }, 1000);
+        }
+
+        function endTimer() {
+            isRunning = false;
+            clearInterval(timer);
+
+            // Call backend to save the time
+            saveDuration(seconds);
+
+            document.getElementById("startBtn").disabled = false;
+            document.getElementById("endBtn").disabled = true;
+        }
+
+        function pad(value) {
+            return value < 10 ? `0${value}` : value;
+        }
+
+        function saveDuration(duration) {
+            fetch('/save-timer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ duration: duration })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Data saved", data);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+    </script>
+
 </body>
 </html>

@@ -109,6 +109,25 @@ def get_record_by_id(record_id):
 		c = conn.cursor()
 		c.execute("SELECT * FROM records WHERE id = ?", (record_id,))
 		return c.fetchone()
+
+@app.route("/save-timer", methods=["POST"])
+def save_timer():
+	data = request.get_json()
+	duration = data.get('duration')
+
+	if not duration:
+		return jsonify({"error": "Invalid data"}), 400
+
+	# save to DB
+	with sqlite3.connect("records.db") as conn:
+		c = conn.cursor()
+		c.execute('''
+		INSERT INTO records (date, start_time, end_time, duration_seconds)
+		VALUES (?, ?, ?, ?)''',
+		(date_cls.today().isoformat(), "00:00:00", "00:00:00", duration))
+		conn.commit()
+	return jsonify({"status": "success", "duration": duration}), 200
+
 	
 if __name__ == "__main__":
 	init_db()
