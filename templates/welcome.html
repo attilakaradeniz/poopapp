@@ -33,6 +33,31 @@
             font-size: 1.1rem;
             color: #555;
         }
+
+        .button-container {
+            margin: 20px;
+        }
+        
+        .timer-container {
+            margin-top: 2rem;
+        }
+
+        #timer {
+            font-size: 2rem;
+        }
+        #progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            height: 20px;
+            margin-top: 10px;
+        }
+        #progress-bar span {
+            display: block;
+            height: 100%;
+            background-color: #76c7c0;
+            width: 0%;
+            transition: width 1s;
+        }
     </style>
 </head>
 <body>
@@ -49,6 +74,19 @@
     <span style="font-size: 2rem;">💩</span>
     Let's record and view your <strong>daily pooptivity</strong>!
 </p>
+
+<div class="timer-controls">
+    <div class="button-container">
+        <button id="startBtn" onclick="startTimer()">START</button>
+        <button id="endBtn" onclick="endTimer()" disabled>END</button>
+    </div>
+
+    <div class="timer-container">
+        <p id="timer">00:00</p>
+        <div id="progress-bar"><span></span></div>
+    </div>
+</div>
+
     
 </body>
 </html>

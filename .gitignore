@@ -17,3 +17,4 @@ records.db
 
 # environments .venv file
 .venv/
+venv/

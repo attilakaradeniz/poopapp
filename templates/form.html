@@ -45,64 +45,6 @@
         <div id="progress-bar"><span></span></div>
     </div>
 
-    <script>
-        let timer;
-        let seconds = 0;
-        let isRunning = false;
-        let progressBar = document.querySelector("#progress-bar span");
-
-        function startTimer() {
-            isRunning = true;
-            document.getElementById("startBtn").disabled = true;
-            document.getElementById("endBtn").disabled = false;
-
-            timer = setInterval(() => {
-                seconds++;
-                let mins = Math.floor(seconds / 60);
-                let secs = seconds % 60;
-
-                // Update timer display
-                document.getElementById("timer").innerText = `${pad(mins)}:${pad(secs)}`;
-
-                // Update progress bar
-                let percentage = (seconds / 3600) * 100; // Assuming 1 hour as max for the demo
-                progressBar.style.width = `${percentage}%`;
-
-            }, 1000);
-        }
-
-        function endTimer() {
-            isRunning = false;
-            clearInterval(timer);
-
-            // Call backend to save the time
-            saveDuration(seconds);
-
-            document.getElementById("startBtn").disabled = false;
-            document.getElementById("endBtn").disabled = true;
-        }
-
-        function pad(value) {
-            return value < 10 ? `0${value}` : value;
-        }
-
-        function saveDuration(duration) {
-            fetch('/save-timer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ duration: duration })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Data saved", data);
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-        }
-    </script>
-
+<script src="../static/js/timer.js"></script>
 </body>
 </html>
