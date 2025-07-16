@@ -4,47 +4,48 @@ let isRunning = false;
 let startTimestamp;
 
 document.addEventListener("DOMContentLoaded", () => {
-    const startBtn = document.getElementById("startBtn");
-    const endBtn = document.getElementById("endBtn");
+    const toggleBtn = document.getElementById("toggleBtn");
     const timerDisplay = document.getElementById("timer");
     const progressBar = document.querySelector("#progress-bar span");
 
-    if (!startBtn || !endBtn) return;
+    if (!toggleBtn) return;
 
-    startBtn.addEventListener("click", () => {
-        if (isRunning) return;
-        isRunning = true;
-        startBtn.disabled = true;
-        endBtn.disabled = false;
+    toggleBtn.addEventListener("click", () => {
+        if (!isRunning) {
+            // START
+            isRunning = true;
+            toggleBtn.innerText = "Stop";
+            toggleBtn.style.backgroundColor = "#e74c3c"; // kırmızı
+            toggleBtn.style.color = "#fff";
 
-        seconds = 0;
-        startTimestamp = new Date(); // 🟡 start the time
+            seconds = 0;
+            startTimestamp = new Date();
 
-        timer = setInterval(() => {
-            seconds++;
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
+            timer = setInterval(() => {
+                seconds++;
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
 
-            timerDisplay.innerText = `${pad(mins)}:${pad(secs)}`;
-            const percentage = (seconds / 3600) * 100;
-            if (progressBar) {
-                progressBar.style.width = `${percentage}%`;
-            }
-        }, 1000);
-    });
+                timerDisplay.innerText = `${pad(mins)}:${pad(secs)}`;
+                const percentage = (seconds / 3600) * 100;
+                if (progressBar) {
+                    progressBar.style.width = `${percentage}%`;
+                }
+            }, 1000);
+        } else {
+            // STOP
+            isRunning = false;
+            clearInterval(timer);
+            toggleBtn.innerText = "Start";
+            toggleBtn.style.backgroundColor = "#2ecc71"; // yeşil
+            toggleBtn.style.color = "#000";
 
-    endBtn.addEventListener("click", () => {
-        if (!isRunning) return;
-        isRunning = false;
-        clearInterval(timer);
-        startBtn.disabled = false;
-        endBtn.disabled = true;
+            const endTimestamp = new Date();
+            const startTimeStr = formatTime(startTimestamp);
+            const endTimeStr = formatTime(endTimestamp);
 
-        const endTimestamp = new Date();
-        const startTimeStr = formatTime(startTimestamp);
-        const endTimeStr = formatTime(endTimestamp);
-
-        saveDuration(seconds, startTimeStr, endTimeStr);
+            saveDuration(seconds, startTimeStr, endTimeStr);
+        }
     });
 
     function pad(value) {
