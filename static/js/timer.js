@@ -1,7 +1,7 @@
-let timer;
-let seconds = 0;
 let isRunning = false;
-let startTimestamp;
+let sessionId = null;
+let seconds = 0;
+let timer;
 
 document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("toggleBtn");
@@ -12,71 +12,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
     toggleBtn.addEventListener("click", () => {
         if (!isRunning) {
-            // START
-            isRunning = true;
-            toggleBtn.innerText = "Stop";
-            toggleBtn.style.backgroundColor = "#e74c3c"; // kırmızı
-            toggleBtn.style.color = "#fff";
+            // START: Fetch server to start a new session
+            fetch("/start-session", { method: "POST" })
+                .then(res => res.json())
+                .then(data => {
+                    sessionId = data.session_id;
+                    isRunning = true;
+                    toggleBtn.textContent = "Stop";
+                    toggleBtn.style.backgroundColor = "#e74c3c";
+                    toggleBtn.style.color = "#fff";
 
-            seconds = 0;
-            startTimestamp = new Date();
-
-            timer = setInterval(() => {
-                seconds++;
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-
-                timerDisplay.innerText = `${pad(mins)}:${pad(secs)}`;
-                const percentage = (seconds / 3600) * 100;
-                if (progressBar) {
-                    progressBar.style.width = `${percentage}%`;
-                }
-            }, 1000);
+                    seconds = 0;
+                    timer = setInterval(() => {
+                        seconds++;
+                        const mins = Math.floor(seconds / 60);
+                        const secs = seconds % 60;
+                        timerDisplay.innerText = `${pad(mins)}:${pad(secs)}`;
+                        const percentage = (seconds / 3600) * 100;
+                        progressBar.style.width = `${percentage}%`;
+                    }, 1000);
+                });
         } else {
-            // STOP
-            isRunning = false;
-            clearInterval(timer);
-            toggleBtn.innerText = "Start";
-            toggleBtn.style.backgroundColor = "#2ecc71"; // yeşil
-            toggleBtn.style.color = "#000";
-
-            const endTimestamp = new Date();
-            const startTimeStr = formatTime(startTimestamp);
-            const endTimeStr = formatTime(endTimestamp);
-
-            saveDuration(seconds, startTimeStr, endTimeStr);
+            // STOP: Stop the session by sending data to the server
+            fetch("/stop-session", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ session_id: sessionId })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Server returned:", data);
+                    clearInterval(timer);
+                    timerDisplay.innerText = "00:00";
+                    progressBar.style.width = "0%";
+                    toggleBtn.textContent = "Start";
+                    toggleBtn.style.backgroundColor = "#2ecc71";
+                    toggleBtn.style.color = "#000";
+                    isRunning = false;
+                    sessionId = null;
+                });
         }
     });
 
-    function pad(value) {
-        return value < 10 ? `0${value}` : value;
-    }
-
-    function formatTime(dateObj) {
-        const hours = pad(dateObj.getHours());
-        const minutes = pad(dateObj.getMinutes());
-        const seconds = pad(dateObj.getSeconds());
-        return `${hours}:${minutes}:${seconds}`;
-    }
-
-    function saveDuration(duration, start_time, end_time) {
-        fetch('/save-timer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                duration: duration,
-                start_time: start_time,
-                end_time: end_time
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Duration saved:", data);
-        })
-        .catch(error => {
-            console.error("Error saving duration:", error);
-        });
+    function pad(val) {
+        return val < 10 ? `0${val}` : val;
     }
 });
