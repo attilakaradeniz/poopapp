@@ -1,7 +1,7 @@
 let isRunning = false;
 let sessionId = null;
-let seconds = 0;
 let timer;
+let startTimestamp = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("toggleBtn");
@@ -22,18 +22,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     toggleBtn.style.backgroundColor = "#e74c3c";
                     toggleBtn.style.color = "#fff";
 
-                    seconds = 0;
+                    // Record the exact timestamp of start
+                    startTimestamp = Date.now();
+
+                    // Update the display every second based on real elapsed time
                     timer = setInterval(() => {
-                        seconds++;
-                        const mins = Math.floor(seconds / 60);
-                        const secs = seconds % 60;
+                        const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+                        const mins = Math.floor(elapsed / 60);
+                        const secs = elapsed % 60;
                         timerDisplay.innerText = `${pad(mins)}:${pad(secs)}`;
-                        const percentage = (seconds / 3600) * 100;
-                        progressBar.style.width = `${percentage}%`;
+
+                        const percentage = (elapsed / 3600) * 100;
+                        if (progressBar) {
+                            progressBar.style.width = `${percentage}%`;
+                        }
                     }, 1000);
                 });
         } else {
-            // STOP: Stop the session by sending data to the server
+            // STOP: Send session ID to the server to stop the session
             fetch("/stop-session", {
                 method: "POST",
                 headers: {
@@ -46,12 +52,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log("Server returned:", data);
                     clearInterval(timer);
                     timerDisplay.innerText = "00:00";
-                    progressBar.style.width = "0%";
+                    if (progressBar) {
+                        progressBar.style.width = "0%";
+                    }
                     toggleBtn.textContent = "Start";
                     toggleBtn.style.backgroundColor = "#2ecc71";
                     toggleBtn.style.color = "#000";
                     isRunning = false;
                     sessionId = null;
+                    startTimestamp = null;
                 });
         }
     });
