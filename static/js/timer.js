@@ -1,6 +1,6 @@
 let isRunning = false;
 let sessionId = null;
-let timer;
+let timer = null;
 let startTimestamp = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     toggleBtn.addEventListener("click", () => {
         if (!isRunning) {
-            // START: Fetch server to start a new session
+            // START: Request server to start a new session
             fetch("/start-session", { method: "POST" })
                 .then(res => res.json())
                 .then(data => {
@@ -22,10 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     toggleBtn.style.backgroundColor = "#e74c3c";
                     toggleBtn.style.color = "#fff";
 
-                    // Record the exact timestamp of start
+                    // Store the start timestamp
                     startTimestamp = Date.now();
 
-                    // Update the display every second based on real elapsed time
+                    // Clear any existing interval
+                    if (timer) clearInterval(timer);
+
+                    // Start a new interval that shows the real elapsed time
                     timer = setInterval(() => {
                         const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
                         const mins = Math.floor(elapsed / 60);
@@ -39,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }, 1000);
                 });
         } else {
-            // STOP: Send session ID to the server to stop the session
+            // STOP: End session and reset UI
             fetch("/stop-session", {
                 method: "POST",
                 headers: {
@@ -51,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     console.log("Server returned:", data);
                     clearInterval(timer);
+                    timer = null;
                     timerDisplay.innerText = "00:00";
                     if (progressBar) {
                         progressBar.style.width = "0%";
