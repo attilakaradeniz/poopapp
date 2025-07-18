@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     deleteForms.forEach(form => {
         form.addEventListener("submit", function (e) {
-            const confirmDelete = confirm("Are you sure you want to delete this record?");
+            const confirmDelete = confirm("Are you sure? Flush that poopentry?");
             if (!confirmDelete) {
                 e.preventDefault(); // Cancel the form submission
             }
