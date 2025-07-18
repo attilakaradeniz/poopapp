@@ -65,7 +65,7 @@
                 <td>{{ record[3] }}</td>
                 <td>{{ record[4] }}</td>
                 <td>
-					<form action="/delete/{{ record[0] }}" method="post" style="display:inline;">
+					<form action="/delete/{{ record[0] }}" method="post" class="delete-form" style="display:inline;">
 						<button type="submit" style="color:red; display: block; margin-bottom: 4px; width: 100%">Delete</button>
 					</form>
 				<!-- Edit Button -->
@@ -79,8 +79,21 @@
     </table>
 
 
-
-
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const deleteForms = document.querySelectorAll(".delete-form");
+    console.log("Founddddddddddd", deleteForms.length, "delete forms");
+    deleteForms.forEach(form => {
+        form.addEventListener("submit", function (e) {
+            const confirmDelete = confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) {
+                e.preventDefault(); // Cancel the form submission
+            }
+        });
+    });
+});
+</script>
+<script src="/static/js/timer.js"></script>
 
 </body>
 </html>

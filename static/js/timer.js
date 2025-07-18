@@ -22,13 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     toggleBtn.style.backgroundColor = "#e74c3c";
                     toggleBtn.style.color = "#fff";
 
-                    // Store the start timestamp
+                    // Record the exact time the session started
                     startTimestamp = Date.now();
 
-                    // Clear any existing interval
+                    // Clear any previous interval (safety)
                     if (timer) clearInterval(timer);
 
-                    // Start a new interval that shows the real elapsed time
+                    // Start a new timer interval based on real elapsed time
                     timer = setInterval(() => {
                         const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
                         const mins = Math.floor(elapsed / 60);
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }, 1000);
                 });
         } else {
-            // STOP: End session and reset UI
+            // STOP: Send request to end the session and reset UI
             fetch("/stop-session", {
                 method: "POST",
                 headers: {
@@ -69,7 +69,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Utility function to zero-pad time values
     function pad(val) {
         return val < 10 ? `0${val}` : val;
     }
+
+    // Intercept form submissions for delete and ask for confirmation
+    const deleteForms = document.querySelectorAll(".delete-form");
+    console.log("Found", deleteForms.length, "delete forms");
+
+    deleteForms.forEach(form => {
+        form.addEventListener("submit", function (e) {
+            const confirmDelete = confirm("Are you sure you want to delete this record?");
+            if (!confirmDelete) {
+                e.preventDefault(); // Cancel the form submission
+            }
+        });
+    });
+
 });
